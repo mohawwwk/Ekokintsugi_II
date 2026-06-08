@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import Button from '../components/Button';
 import Layout from '../components/Layout';
+import Card from '../components/Card';
+import Input from '../components/Input';
 
 export default function WeeklyReview() {
   const navigate = useNavigate();
@@ -72,8 +74,7 @@ export default function WeeklyReview() {
   return (
     <Layout showBack title="Weekly Review">
       <div className="max-w-2xl mx-auto">
-        <div className="card mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Review Progress</h2>
+        <Card title="Review Progress" className="mb-6">
           <div className="flex gap-2">
             {[1,2,3,4,5,6,7,8].map(week => (
               <div
@@ -91,108 +92,90 @@ export default function WeeklyReview() {
             ))}
           </div>
           <p className="text-sm text-gray-600 mt-3">
-            {existingReviews.length} of 8 weeks completed
+            {existingReviews.length} of 8 reviews completed. You earn 10 points for each review.
           </p>
-        </div>
+        </Card>
 
-        {error && formData.weekNumber > 8 && (
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg mb-4">
-            {error}
-          </div>
-        )}
+        <Card title={`Week ${formData.weekNumber} Review`}>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
+              {error}
+            </div>
+          )}
 
-        {success && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
-            {success}
-          </div>
-        )}
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">
+              {success}
+            </div>
+          )}
 
-        {error && formData.weekNumber <= 8 && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="card">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">
-            Week {formData.weekNumber} Review
-          </h2>
-
-          <div className="grid grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Days Worn This Week (1-7)
-              </label>
-              <input
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Days Worn"
                 type="number"
                 name="daysWorn"
                 value={formData.daysWorn}
                 onChange={handleChange}
-                min="1"
+                min="0"
                 max="7"
-                className="input-field"
                 required
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Hours Per Day (1-24)
-              </label>
-              <input
+              <Input
+                label="Hours Per Day"
                 type="number"
                 name="hoursPerDay"
                 value={formData.hoursPerDay}
                 onChange={handleChange}
-                min="1"
+                min="0"
                 max="24"
-                className="input-field"
                 required
               />
             </div>
-          </div>
 
-          <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-4">Rate Your Experience (1-10)</h3>
             <div className="space-y-4">
-              {[
-                { name: 'comfort', label: 'Comfort' },
-                { name: 'fit', label: 'Fit' },
-                { name: 'sole', label: 'Sole' },
-                { name: 'material', label: 'Material' },
-                { name: 'stitching', label: 'Stitching' }
-              ].map(item => (
-                <div key={item.name} className="flex items-center gap-4">
-                  <span className="w-24 text-sm text-gray-600">{item.label}</span>
-                  <input
-                    type="range"
-                    name={item.name}
-                    value={formData[item.name]}
-                    onChange={handleChange}
-                    min="1"
-                    max="10"
-                    className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                  />
-                  <span className="w-8 text-center font-medium">{formData[item.name]}</span>
-                </div>
-              ))}
+              <h4 className="font-medium text-gray-900 border-b border-gray-100 pb-2">Ratings (1-10)</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { label: 'Comfort', name: 'comfort' },
+                  { label: 'Fit', name: 'fit' },
+                  { label: 'Sole Durability', name: 'sole' },
+                  { label: 'Material Quality', name: 'material' },
+                  { label: 'Stitching', name: 'stitching' }
+                ].map(field => (
+                  <div key={field.name}>
+                    <label className="block text-sm text-gray-600 mb-1">{field.label}</label>
+                    <input
+                      type="range"
+                      name={field.name}
+                      value={formData[field.name]}
+                      onChange={handleChange}
+                      min="1"
+                      max="10"
+                      className="w-full accent-primary-600"
+                    />
+                    <div className="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span className="font-bold text-primary-600">{formData[field.name]}</span>
+                      <span>10</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Additional Feedback (Optional)
-            </label>
-            <textarea
-              name="feedback"
-              value={formData.feedback}
-              onChange={handleChange}
-              className="input-field h-24 resize-none"
-              placeholder="Share your thoughts about the shoe..."
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Additional Feedback</label>
+              <textarea
+                name="feedback"
+                value={formData.feedback}
+                onChange={(e) => setFormData({ ...formData, feedback: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 h-24 resize-none"
+                placeholder="Any specific comments about the shoe's performance this week?"
+              />
+            </div>
 
-          <Button
+            <Button
               type="submit"
               loading={loading}
               className="w-full"
@@ -201,7 +184,8 @@ export default function WeeklyReview() {
               Submit Review
             </Button>
           </form>
-        </div>
-      </Layout>
-    );
+        </Card>
+      </div>
+    </Layout>
+  );
   }
