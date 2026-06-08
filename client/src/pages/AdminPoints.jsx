@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import Layout from '../components/Layout';
+import Card from '../components/Card';
+import Modal from '../components/Modal';
+import Input from '../components/Input';
+import Button from '../components/Button';
+import Loading from '../components/Loading';
 
 export default function AdminPoints() {
   const [users, setUsers] = useState([]);
@@ -55,166 +61,178 @@ export default function AdminPoints() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
+    return <Loading fullScreen />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link to="/admin" className="text-gray-600 hover:text-gray-900">← Admin</Link>
-          <h1 className="font-semibold text-gray-900">Manage Points</h1>
-        </div>
-      </nav>
-
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 gap-8">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">All Users & Points</h2>
-            
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-                {error}
-              </div>
-            )}
-
-            {success && (
-              <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
-                {success}
-              </div>
-            )}
-
-            <div className="space-y-3">
-              {users.map(user => (
-                <div key={user.id} className="card">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-medium text-gray-900">{user.name}</p>
-                      <p className="text-sm text-gray-500">{user.email}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-primary-600">{user.pointsRemaining}</p>
-                      <p className="text-xs text-gray-500">remaining</p>
-                      <div className="flex gap-1 mt-1 justify-end">
-                        <button
-                          onClick={() => { setSelectedUser(user); setPointsAction('add'); }}
-                          className="text-xs bg-primary-100 text-primary-700 px-2 py-1 rounded hover:bg-primary-200"
-                        >
-                          + Add
-                        </button>
-                        <button
-                          onClick={() => { setSelectedUser(user); setPointsAction('redeem'); }}
-                          className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200"
-                        >
-                          - Redeem
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-2 pt-2 border-t border-gray-100 flex justify-between text-sm text-gray-500">
-                    <span>Total: {user.pointsTotal}</span>
-                    <span>Used: {user.pointsUsed}</span>
-                  </div>
-                </div>
-              ))}
+    <Layout showBack title="Manage Points">
+      <div className="grid md:grid-cols-2 gap-8">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Member Point Balances</h2>
+          
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
+              {error}
             </div>
-          </div>
+          )}
 
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-            
-            <div className="card">
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Action</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setPointsAction('add')}
-                    className={`p-3 rounded-lg border-2 transition-colors ${
-                      pointsAction === 'add'
-                        ? 'border-primary-500 bg-primary-50 text-primary-700'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">
+              {success}
+            </div>
+          )}
+
+          <div className="grid gap-4">
+            {users.map(user => (
+              <Card key={user.id}>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="font-bold text-gray-900">{user.name}</h3>
+                    <p className="text-sm text-gray-500">{user.email}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-primary-600">{user.pointsRemaining}</p>
+                    <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Balance</p>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-50 flex justify-between items-center">
+                  <div className="text-xs text-gray-500">
+                    Total Earned: <span className="font-medium text-gray-700">{user.pointsTotal}</span>
+                  </div>
+                  <Button 
+                    variant="outline"
+                    className="text-xs py-1"
+                    onClick={() => setSelectedUser(user)}
                   >
-                    <span className="block text-xl mb-1">➕</span>
-                    <span className="font-medium">Add Points</span>
-                  </button>
-                  <button
-                    onClick={() => setPointsAction('redeem')}
-                    className={`p-3 rounded-lg border-2 transition-colors ${
-                      pointsAction === 'redeem'
-                        ? 'border-yellow-500 bg-yellow-50 text-yellow-700'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <span className="block text-xl mb-1">➖</span>
-                    <span className="font-medium">Redeem Points</span>
-                  </button>
+                    Adjust Points
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        <div className="hidden md:block">
+          <Card title="Quick Adjust" subtitle="Select a user to update their points">
+            {!selectedUser ? (
+              <div className="text-center py-12 text-gray-400">
+                <div className="text-4xl mb-2">⭐</div>
+                <p>Click "Adjust Points" on a user to start</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="bg-primary-50 p-4 rounded-lg border border-primary-100">
+                  <p className="text-sm text-primary-800 font-medium">{selectedUser.name}</p>
+                  <p className="text-xs text-primary-600">Current Balance: {selectedUser.pointsRemaining}</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Action</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => setPointsAction('add')}
+                        className={`py-2 rounded-lg border text-sm font-medium transition-colors ${
+                          pointsAction === 'add'
+                            ? 'bg-primary-600 text-white border-primary-600'
+                            : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                        }`}
+                      >
+                        Add Points
+                      </button>
+                      <button
+                        onClick={() => setPointsAction('redeem')}
+                        className={`py-2 rounded-lg border text-sm font-medium transition-colors ${
+                          pointsAction === 'redeem'
+                            ? 'bg-red-600 text-white border-red-600'
+                            : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                        }`}
+                      >
+                        Redeem Points
+                      </button>
+                    </div>
+                  </div>
+
+                  <Input
+                    label="Amount"
+                    type="number"
+                    value={points}
+                    onChange={(e) => setPoints(e.target.value)}
+                    placeholder="Enter amount..."
+                  />
+
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="secondary" 
+                      className="flex-1"
+                      onClick={() => setSelectedUser(null)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      className="flex-1"
+                      onClick={handleSubmit}
+                    >
+                      Confirm
+                    </Button>
+                  </div>
                 </div>
               </div>
+            )}
+          </Card>
+        </div>
+      </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Select User</label>
-                <select
-                  value={selectedUser?.id || ''}
-                  onChange={(e) => setSelectedUser(users.find(u => u.id === e.target.value))}
-                  className="input-field"
+      <Modal
+        isOpen={!!selectedUser}
+        onClose={() => setSelectedUser(null)}
+        title={`Adjust Points for ${selectedUser?.name}`}
+        className="md:hidden"
+      >
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Action</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setPointsAction('add')}
+                  className={`py-2 rounded-lg border text-sm font-medium transition-colors ${
+                    pointsAction === 'add'
+                      ? 'bg-primary-600 text-white border-primary-600'
+                      : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                  }`}
                 >
-                  <option value="">Choose a user</option>
-                  {users.map(user => (
-                    <option key={user.id} value={user.id}>
-                      {user.name} ({user.pointsRemaining} pts)
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Points</label>
-                <input
-                  type="number"
-                  value={points}
-                  onChange={(e) => setPoints(e.target.value)}
-                  className="input-field"
-                  placeholder="Enter points"
-                  min="1"
-                />
-              </div>
-
-              <button
-                onClick={handleSubmit}
-                disabled={!selectedUser || !points}
-                className="btn-primary w-full disabled:opacity-50"
-              >
-                {pointsAction === 'add' ? 'Add Points' : 'Redeem Points'}
-              </button>
-            </div>
-
-            <div className="card mt-4">
-              <h3 className="font-medium text-gray-900 mb-2">Quick Add Points</h3>
-              <div className="grid grid-cols-4 gap-2">
-                {[10, 25, 50, 100].map(p => (
-                  <button
-                    key={p}
-                    onClick={() => {
-                      if (selectedUser) {
-                        setPoints(p);
-                      }
-                    }}
-                    disabled={!selectedUser}
-                    className="btn-secondary text-sm disabled:opacity-50"
-                  >
-                    +{p}
-                  </button>
-                ))}
+                  Add Points
+                </button>
+                <button
+                  onClick={() => setPointsAction('redeem')}
+                  className={`py-2 rounded-lg border text-sm font-medium transition-colors ${
+                    pointsAction === 'redeem'
+                      ? 'bg-red-600 text-white border-red-600'
+                      : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  Redeem Points
+                </button>
               </div>
             </div>
+
+            <Input
+              label="Amount"
+              type="number"
+              value={points}
+              onChange={(e) => setPoints(e.target.value)}
+              placeholder="Enter amount..."
+            />
+
+            <Button 
+              className="w-full"
+              onClick={handleSubmit}
+            >
+              Confirm Update
+            </Button>
           </div>
         </div>
-      </main>
-    </div>
-  );
+      </Modal>
+    </Layout>;
 }
