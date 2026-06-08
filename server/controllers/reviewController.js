@@ -1,4 +1,5 @@
 const prisma = require('../utils/prisma');
+const response = require('../utils/responseHelper');
 
 exports.createReview = async (req, res) => {
   try {
@@ -6,7 +7,7 @@ exports.createReview = async (req, res) => {
     const { weekNumber, daysWorn, hoursPerDay, comfort, fit, sole, material, stitching, feedback } = req.body;
 
     if (weekNumber < 1 || weekNumber > 8) {
-      return res.status(400).json({ error: 'Week number must be between 1 and 8' });
+      return response.error(res, 'Week number must be between 1 and 8', 400);
     }
 
     const existingReview = await prisma.review.findUnique({
@@ -16,12 +17,12 @@ exports.createReview = async (req, res) => {
     });
 
     if (existingReview) {
-      return res.status(400).json({ error: `Review for week ${weekNumber} already submitted` });
+      return response.error(res, `Review for week ${weekNumber} already submitted`, 400);
     }
 
     const userReviews = await prisma.review.findMany({ where: { userId } });
     if (userReviews.length >= 8) {
-      return res.status(400).json({ error: 'Maximum 8 reviews per user reached' });
+      return response.error(res, 'Maximum 8 reviews per user reached', 400);
     }
 
     for (let w = 1; w < weekNumber; w++) {
@@ -29,7 +30,7 @@ exports.createReview = async (req, res) => {
         where: { userId_weekNumber: { userId, weekNumber: w } }
       });
       if (!prevReview) {
-        return res.status(400).json({ error: `Please complete week ${w} review before submitting week ${weekNumber}` });
+        return response.error(res, `Please complete week ${w} review before submitting week ${weekNumber}`, 400);
       }
     }
 
@@ -53,13 +54,10 @@ exports.createReview = async (req, res) => {
       data: { pointsRemaining: { increment: 10 } }
     });
 
-    res.status(201).json({
-      message: 'Review submitted successfully',
-      review
-    });
+    return response.success(res, { review }, 'Review submitted successfully', 201);
   } catch (error) {
     console.error('Create review error:', error);
-    res.status(500).json({ error: 'Failed to create review' });
+    return response.error(res, 'Failed to create review');
   }
 };
 
@@ -72,10 +70,10 @@ exports.getReviewsByUser = async (req, res) => {
       orderBy: { weekNumber: 'asc' }
     });
 
-    res.json({ reviews, count: reviews.length });
+    return response.success(res, { reviews, count: reviews.length });
   } catch (error) {
     console.error('Get reviews error:', error);
-    res.status(500).json({ error: 'Failed to fetch reviews' });
+    return response.error(res, 'Failed to fetch reviews');
   }
 };
 
@@ -90,9 +88,9 @@ exports.getAllReviews = async (req, res) => {
       orderBy: { createdAt: 'desc' }
     });
 
-    res.json({ reviews });
+    return response.success(res, { reviews });
   } catch (error) {
     console.error('Get all reviews error:', error);
-    res.status(500).json({ error: 'Failed to fetch reviews' });
+    return response.error(res, 'Failed to fetch reviews');
   }
 };
