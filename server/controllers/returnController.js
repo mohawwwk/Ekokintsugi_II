@@ -1,6 +1,10 @@
 const prisma = require('../utils/prisma');
 const response = require('../utils/responseHelper');
 
+/**
+ * Create a new return request for a shoe
+ * @route POST /api/returns/request
+ */
 exports.createReturnRequest = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -46,6 +50,10 @@ exports.createReturnRequest = async (req, res) => {
   }
 };
 
+/**
+ * Update the status or final action of a return request
+ * @route PUT /api/returns/:id
+ */
 exports.updateReturn = async (req, res) => {
   try {
     const { id } = req.params;
@@ -81,6 +89,10 @@ exports.updateReturn = async (req, res) => {
   }
 };
 
+/**
+ * Get all return requests (Admin only)
+ * @route GET /api/returns
+ */
 exports.getAllReturns = async (req, res) => {
   try {
     const returns = await prisma.return.findMany({
