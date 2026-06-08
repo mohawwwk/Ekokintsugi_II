@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Button from '../components/Button';
+import Input from '../components/Input';
+import Card from '../components/Card';
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -61,7 +63,7 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
-      <div className="card max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <Card className="max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <div className="text-center mb-6">
           <div className="w-14 h-14 bg-primary-600 rounded-full flex items-center justify-center mx-auto mb-3">
             <span className="text-xl">🌱</span>
@@ -79,64 +81,58 @@ export default function Signup() {
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-              <input
-                type="text"
+              <Input
+                label="Full Name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="input-field"
                 placeholder="Made Surya"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input
+              <Input
+                label="Email"
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="input-field"
                 placeholder="you@example.com"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-              <input
+              <Input
+                label="Phone"
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="input-field"
                 placeholder="+62..."
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <input
+              <Input
+                label="Password"
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="input-field"
                 placeholder="••••••"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-              <input
+              <Input
+                label="Confirm Password"
                 type="password"
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="input-field"
                 placeholder="••••••"
                 required
               />
@@ -148,7 +144,7 @@ export default function Signup() {
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="input-field"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
               >
                 <option value="supporter">Supporter</option>
                 <option value="team">Team</option>
@@ -157,25 +153,21 @@ export default function Signup() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-              <input
-                type="text"
+              <Input
+                label="City"
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
-                className="input-field"
                 placeholder="Bali"
               />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-              <input
-                type="text"
+              <Input
+                label="Address"
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
-                className="input-field"
                 placeholder="Street address"
               />
             </div>
@@ -186,7 +178,7 @@ export default function Signup() {
                 name="shoeSize"
                 value={formData.shoeSize}
                 onChange={handleChange}
-                className="input-field"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
               >
                 <option value="">Select size</option>
                 {[38,39,40,41,42,43,44,45,46,47].map(size => (
@@ -209,7 +201,7 @@ export default function Signup() {
           Already have an account?{' '}
           <Link to="/login" className="text-primary-600 hover:underline">Sign in</Link>
         </p>
-      </div>
+      </Card>
     </div>
   );
 }
