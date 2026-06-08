@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Button from '../components/Button';
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -195,13 +196,13 @@ export default function Signup() {
             </div>
           </div>
 
-          <button
+          <Button
             type="submit"
-            disabled={loading}
-            className="btn-primary w-full disabled:opacity-50 mt-4"
+            loading={loading}
+            className="w-full mt-4"
           >
-            {loading ? 'Creating account...' : 'Create Account'}
-          </button>
+            Create Account
+          </Button>
         </form>
 
         <p className="text-center text-sm text-gray-600 mt-4">
