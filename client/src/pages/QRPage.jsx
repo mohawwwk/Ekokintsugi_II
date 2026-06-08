@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
+import Card from '../components/Card';
+import Badge from '../components/Badge';
+import Loading from '../components/Loading';
 
 export default function QRPage() {
   const { userId } = useParams();
@@ -24,22 +27,18 @@ export default function QRPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
+    return <Loading fullScreen />;
   }
 
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
-        <div className="card text-center">
+        <Card className="text-center max-w-sm">
           <div className="text-4xl mb-4">🔍</div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">User Not Found</h2>
           <p className="text-gray-600 mb-4">The QR code is invalid or the user no longer exists.</p>
           <Link to="/login" className="btn-primary inline-block">Go to Login</Link>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -55,14 +54,16 @@ export default function QRPage() {
           <p className="text-gray-600">Founding Circle Member</p>
         </div>
 
-        <div className="card">
+        <Card>
           <div className="text-center mb-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-1">{qrData?.name}</h2>
-            <p className="text-sm text-gray-600">{qrData?.data?.role}</p>
+            <p className="text-sm text-gray-600 uppercase tracking-wider font-bold text-primary-600">
+              {qrData?.data?.role}
+            </p>
           </div>
 
           <div className="flex justify-center mb-6">
-            <div className="p-4 bg-white rounded-xl shadow-sm">
+            <div className="p-4 bg-white rounded-xl shadow-sm border border-gray-100">
               <img
                 src={qrData?.qrCode}
                 alt="QR Code"
@@ -83,7 +84,7 @@ export default function QRPage() {
           </div>
 
           {qrData?.data?.shoe && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+            <div className="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-100">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">👟</span>
                 <div>
@@ -91,17 +92,14 @@ export default function QRPage() {
                   <p className="text-sm text-gray-600">Size {qrData.data.shoe.size}</p>
                 </div>
               </div>
-              <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                qrData.data.shoe.status === 'Delivered' ? 'bg-green-100 text-green-700' :
-                'bg-yellow-100 text-yellow-700'
-              }`}>
+              <Badge variant={qrData.data.shoe.status === 'Delivered' ? 'success' : 'warning'}>
                 {qrData.data.shoe.status}
-              </span>
+              </Badge>
             </div>
           )}
 
           {qrData?.data?.tree && (
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">🌳</span>
                 <div>
@@ -109,16 +107,16 @@ export default function QRPage() {
                   <p className="text-sm text-gray-600">{qrData.data.tree.location}</p>
                 </div>
               </div>
+              <Badge variant="success">{qrData.data.tree.status}</Badge>
             </div>
           )}
-        </div>
+        </Card>
 
-        <div className="text-center mt-6">
-          <Link to="/login" className="text-sm text-primary-600 hover:underline">
-            Member Login
+        <div className="text-center mt-8">
+          <Link to="/dashboard" className="text-sm text-gray-600 hover:text-gray-900">
+            ← Back to Dashboard
           </Link>
         </div>
       </div>
     </div>
   );
-}
