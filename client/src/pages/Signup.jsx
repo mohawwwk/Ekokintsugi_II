@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Card from '../components/Card';
@@ -17,9 +18,9 @@ export default function Signup() {
     address: '',
     shoeSize: ''
   });
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
+  const { success, error: toastError } = useToast();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -28,16 +29,13 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
+      return toastError('Passwords do not match');
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
+      return toastError('Password must be at least 6 characters');
     }
 
     setLoading(true);
@@ -53,9 +51,10 @@ export default function Signup() {
         address: formData.address,
         shoeSize: formData.shoeSize
       });
+      success('Account created successfully');
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Signup failed');
+      toastError(err.response?.data?.error || 'Signup failed');
     } finally {
       setLoading(false);
     }
@@ -71,12 +70,6 @@ export default function Signup() {
           <h1 className="text-xl font-bold text-gray-900">Join EkoKintsugi</h1>
           <p className="text-gray-600 text-sm">Founding Circle Registration</p>
         </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
