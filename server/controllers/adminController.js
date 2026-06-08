@@ -21,6 +21,10 @@ function generateQRCode(userId) {
   return `https://ekokintsugi.com/qr/${userId}`;
 }
 
+/**
+ * Create a new user with pre-assigned shoe and tree assets
+ * @route POST /api/admin/users
+ */
 exports.createUser = async (req, res) => {
   try {
     const { name, phone, email, password, role, city, address, shoeSize, startDate, endDate } = req.body;
@@ -108,6 +112,10 @@ exports.createUser = async (req, res) => {
   }
 };
 
+/**
+ * Get overall system statistics for admin dashboard
+ * @route GET /api/admin/stats
+ */
 exports.getStats = async (req, res) => {
   try {
     const userCount = await prisma.user.count();
@@ -129,6 +137,10 @@ exports.getStats = async (req, res) => {
   }
 };
 
+/**
+ * Get all users with their associated assets
+ * @route GET /api/admin/users
+ */
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
