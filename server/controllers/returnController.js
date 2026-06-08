@@ -1,4 +1,5 @@
 const prisma = require('../utils/prisma');
+const response = require('../utils/responseHelper');
 
 exports.createReturnRequest = async (req, res) => {
   try {
@@ -7,11 +8,11 @@ exports.createReturnRequest = async (req, res) => {
 
     const shoe = await prisma.shoe.findUnique({ where: { id: shoeId } });
     if (!shoe) {
-      return res.status(404).json({ error: 'Shoe not found' });
+      return response.error(res, 'Shoe not found', 404);
     }
 
     if (shoe.userId !== userId) {
-      return res.status(403).json({ error: 'This shoe does not belong to you' });
+      return response.error(res, 'This shoe does not belong to you', 403);
     }
 
     const existingReturn = await prisma.return.findFirst({
@@ -19,7 +20,7 @@ exports.createReturnRequest = async (req, res) => {
     });
 
     if (existingReturn) {
-      return res.status(400).json({ error: 'An active return request already exists for this shoe' });
+      return response.error(res, 'An active return request already exists for this shoe', 400);
     }
 
     const returnRequest = await prisma.return.create({
@@ -36,13 +37,12 @@ exports.createReturnRequest = async (req, res) => {
       data: { status: 'Returned' }
     });
 
-    res.status(201).json({
-      message: 'Return request submitted successfully',
+    return response.success(res, {
       return: returnRequest
-    });
+    }, 'Return request submitted successfully', 201);
   } catch (error) {
     console.error('Create return request error:', error);
-    res.status(500).json({ error: 'Failed to create return request' });
+    return response.error(res, 'Failed to create return request');
   }
 };
 
@@ -53,7 +53,7 @@ exports.updateReturn = async (req, res) => {
 
     const returnRequest = await prisma.return.findUnique({ where: { id } });
     if (!returnRequest) {
-      return res.status(404).json({ error: 'Return request not found' });
+      return response.error(res, 'Return request not found', 404);
     }
 
     const updateData = {};
@@ -72,13 +72,12 @@ exports.updateReturn = async (req, res) => {
       });
     }
 
-    res.json({
-      message: 'Return updated successfully',
+    return response.success(res, {
       return: updatedReturn
-    });
+    }, 'Return updated successfully');
   } catch (error) {
     console.error('Update return error:', error);
-    res.status(500).json({ error: 'Failed to update return' });
+    return response.error(res, 'Failed to update return');
   }
 };
 
@@ -92,10 +91,10 @@ exports.getAllReturns = async (req, res) => {
       orderBy: { createdAt: 'desc' }
     });
 
-    res.json({ returns });
+    return response.success(res, { returns });
   } catch (error) {
     console.error('Get all returns error:', error);
-    res.status(500).json({ error: 'Failed to fetch returns' });
+    return response.error(res, 'Failed to fetch returns');
   }
 };
 
