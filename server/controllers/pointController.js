@@ -1,6 +1,10 @@
 const prisma = require('../utils/prisma');
 const response = require('../utils/responseHelper');
 
+/**
+ * Add points to a user
+ * @route POST /api/points/add
+ */
 exports.addPoints = async (req, res) => {
   try {
     const { userId, points, reason } = req.body;
@@ -32,6 +36,10 @@ exports.addPoints = async (req, res) => {
   }
 };
 
+/**
+ * Redeem points from a user
+ * @route POST /api/points/redeem
+ */
 exports.redeemPoints = async (req, res) => {
   try {
     const { userId, points } = req.body;
@@ -68,6 +76,10 @@ exports.redeemPoints = async (req, res) => {
   }
 };
 
+/**
+ * Get point balance for a specific user
+ * @route GET /api/points/:userId
+ */
 exports.getPoints = async (req, res) => {
   try {
     const { userId } = req.params;
