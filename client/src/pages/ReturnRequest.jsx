@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
-import Navbar from '../components/Navbar';
 import Button from '../components/Button';
+import Layout from '../components/Layout';
 
 export default function ReturnRequest() {
   const navigate = useNavigate();
@@ -72,10 +72,8 @@ export default function ReturnRequest() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar showBack title="Return Request" />
-
-      <main className="max-w-2xl mx-auto px-4 py-8">
+    <Layout showBack title="Return Request">
+      <div className="max-w-2xl mx-auto">
         {existingReturns.length > 0 && (
           <div className="card mb-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Your Return Requests</h2>
@@ -171,8 +169,8 @@ export default function ReturnRequest() {
             >
               Submit Request
             </Button>
-        </form>
-      </main>
-    </div>
-  );
-}
+          </form>
+        </div>
+      </Layout>
+    );
+  }

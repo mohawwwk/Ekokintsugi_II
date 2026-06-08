@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
-import Navbar from '../components/Navbar';
 import Button from '../components/Button';
+import Layout from '../components/Layout';
 
 export default function WeeklyReview() {
   const navigate = useNavigate();
@@ -70,10 +70,8 @@ export default function WeeklyReview() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar showBack title="Weekly Review" />
-
-      <main className="max-w-2xl mx-auto px-4 py-8">
+    <Layout showBack title="Weekly Review">
+      <div className="max-w-2xl mx-auto">
         <div className="card mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Review Progress</h2>
           <div className="flex gap-2">
@@ -202,8 +200,8 @@ export default function WeeklyReview() {
             >
               Submit Review
             </Button>
-        </form>
-      </main>
-    </div>
-  );
-}
+          </form>
+        </div>
+      </Layout>
+    );
+  }

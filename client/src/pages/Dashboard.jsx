@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import Navbar from '../components/Navbar';
 import Loading from '../components/Loading';
+import Layout from '../components/Layout';
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -38,11 +38,8 @@ export default function Dashboard() {
   const progress = data ? (data.user.reviewsCompleted / data.user.maxReviews) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">Welcome, {data?.user?.name}</h1>
+    <Layout>
+      <h1 className="text-2xl font-bold text-gray-900 mb-8">Welcome, {data?.user?.name}</h1>
 
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="card">
@@ -205,8 +202,7 @@ export default function Dashboard() {
               </table>
             </div>
           </div>
-        )}
-      </main>
-    </div>
-  );
-}
+        </div>
+      </Layout>
+    );
+  }
