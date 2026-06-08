@@ -2,6 +2,10 @@ const QRCode = require('qrcode');
 const prisma = require('../utils/prisma');
 const response = require('../utils/responseHelper');
 
+/**
+ * Generate a QR code containing user and asset data
+ * @route GET /api/qr/generate/:userId
+ */
 exports.generateQR = async (req, res) => {
   try {
     const { userId } = req.params;
