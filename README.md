@@ -9,13 +9,36 @@ A structured lifecycle tracking system with QR interaction, strict rules, and ad
 - Tailwind CSS
 - React Router
 - Axios
+- Custom UI Component Library (Card, Badge, Button, Modal, Loading, Toast)
 
 **Backend:**
 - Node.js + Express.js
 - SQLite (Prisma ORM)
 - JWT Authentication
 - QR Code generation (qrcode)
-- Multer (image uploads)
+- Custom Standardized Response Helper
+- Request Logging Middleware
+
+## Key Features
+
+- **Lifecycle Tracking**: Monitor the entire journey of your EkoKintsugi shoes.
+- **Weekly Reviews**: Submit structured feedback and earn circle points.
+- **Points System**: Reward-based participation in the founding circle.
+- **QR Identity**: Each member has a unique QR code for easy asset verification.
+- **Admin Dashboard**: Comprehensive management of users, returns, and analytics.
+- **Sustainability Focus**: Integrated tree planting tracking for every participant.
+
+## UI Components
+
+The project uses a custom set of reusable components located in `client/src/components`:
+- `Button`: Multi-variant buttons with loading states.
+- `Card`: Standardized content containers.
+- `Badge`: Status indicators for roles and assets.
+- `Input`: Modern form inputs with built-in styling.
+- `Modal`: Animated overlays for complex interactions.
+- `Layout`: Consistent page structure across the app.
+- `Toast`: Feedback notifications for user actions.
+- `Loading`: Beautiful full-screen and inline loading states.
 
 ## Project Structure
 
