@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const logger = require('./middlewares/logger');
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ const qrRoutes = require('./routes/qr');
 const app = express();
 
 app.use(cors());
+app.use(logger);
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
