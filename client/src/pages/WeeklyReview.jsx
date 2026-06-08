@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
+import { useToast } from '../context/ToastContext';
 import Button from '../components/Button';
 import Layout from '../components/Layout';
 import Card from '../components/Card';
@@ -8,6 +9,7 @@ import Input from '../components/Input';
 
 export default function WeeklyReview() {
   const navigate = useNavigate();
+  const { success, error: toastError } = useToast();
   const [formData, setFormData] = useState({
     weekNumber: 1,
     daysWorn: 5,
@@ -20,8 +22,6 @@ export default function WeeklyReview() {
     feedback: ''
   });
   const [existingReviews, setExistingReviews] = useState([]);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function WeeklyReview() {
       
       const nextWeek = (response.data.reviews?.length || 0) + 1;
       if (nextWeek > 8) {
-        setError('You have completed all 8 weekly reviews!');
+        toastError('You have completed all 8 weekly reviews!');
       } else {
         setFormData(prev => ({ ...prev, weekNumber: nextWeek }));
       }
@@ -51,16 +51,14 @@ export default function WeeklyReview() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
     setLoading(true);
 
     try {
       await api.post('/reviews', formData);
-      setSuccess('Review submitted successfully! You earned 10 points.');
-      setTimeout(() => navigate('/dashboard'), 2000);
+      success('Review submitted successfully! You earned 10 points.');
+      navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to submit review');
+      toastError(err.response?.data?.error || 'Failed to submit review');
     } finally {
       setLoading(false);
     }
@@ -97,18 +95,6 @@ export default function WeeklyReview() {
         </Card>
 
         <Card title={`Week ${formData.weekNumber} Review`}>
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">
-              {success}
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <Input

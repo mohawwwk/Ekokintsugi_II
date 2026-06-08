@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
+import { useToast } from '../context/ToastContext';
 import Button from '../components/Button';
 import Layout from '../components/Layout';
 import Card from '../components/Card';
@@ -8,16 +9,16 @@ import Badge from '../components/Badge';
 import Input from '../components/Input';
 
 export default function ReturnRequest() {
-  const navigate = useNavigate();
-  const [shoe, setShoe] = useState(null);
   const [formData, setFormData] = useState({
+    shoeId: '',
     reason: '',
     condition: 'Good'
   });
+  const [shoe, setShoe] = useState(null);
   const [existingReturns, setExistingReturns] = useState([]);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const { success, error: toastError } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
@@ -25,40 +26,32 @@ export default function ReturnRequest() {
 
   const fetchData = async () => {
     try {
-      const response = await api.get('/user/me');
-      setShoe(response.data.shoe);
-      setExistingReturns(response.data.user?.returns || []);
+      const res = await api.get('/user/me');
+      setShoe(res.data.shoe);
+      if (res.data.shoe) {
+        setFormData(prev => ({ ...prev, shoeId: res.data.shoe.id }));
+      }
+      
+      const returnsRes = await api.get('/returns');
+      setExistingReturns(returnsRes.data.returns || []);
     } catch (err) {
-      console.error('Failed to fetch data:', err);
+      console.error(err);
     }
   };
 
   const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
     setLoading(true);
-
-    if (!shoe) {
-      setError('No shoe assigned to your account');
-      setLoading(false);
-      return;
-    }
-
     try {
-      await api.post('/returns/request', {
-        shoeId: shoe.id,
-        reason: formData.reason,
-        condition: formData.condition
-      });
-      setSuccess('Return request submitted successfully!');
-      setTimeout(() => navigate('/dashboard'), 2000);
+      await api.post('/returns/request', formData);
+      success('Return request submitted successfully');
+      navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to submit return request');
+      toastError(err.response?.data?.message || 'Failed to submit request');
     } finally {
       setLoading(false);
     }
@@ -96,18 +89,6 @@ export default function ReturnRequest() {
         )}
 
         <Card title="New Return Request">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">
-              {success}
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 mb-4">
               <p className="text-sm text-gray-600 mb-1">Returning Asset:</p>
