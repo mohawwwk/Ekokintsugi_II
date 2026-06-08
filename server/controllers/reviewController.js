@@ -1,6 +1,10 @@
 const prisma = require('../utils/prisma');
 const response = require('../utils/responseHelper');
 
+/**
+ * Create a new weekly review and award points
+ * @route POST /api/reviews
+ */
 exports.createReview = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -61,6 +65,10 @@ exports.createReview = async (req, res) => {
   }
 };
 
+/**
+ * Get all reviews for a specific user
+ * @route GET /api/reviews/user/:userId
+ */
 exports.getReviewsByUser = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -77,6 +85,10 @@ exports.getReviewsByUser = async (req, res) => {
   }
 };
 
+/**
+ * Get all reviews from all users (Admin only)
+ * @route GET /api/reviews
+ */
 exports.getAllReviews = async (req, res) => {
   try {
     const reviews = await prisma.review.findMany({
