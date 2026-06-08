@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
+import Navbar from '../components/Navbar';
+import Button from '../components/Button';
 
 export default function WeeklyReview() {
   const navigate = useNavigate();
@@ -69,14 +71,7 @@ export default function WeeklyReview() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link to="/dashboard" className="text-gray-600 hover:text-gray-900">
-            ← Back
-          </Link>
-          <h1 className="font-semibold text-gray-900">Weekly Review</h1>
-        </div>
-      </nav>
+      <Navbar showBack title="Weekly Review" />
 
       <main className="max-w-2xl mx-auto px-4 py-8">
         <div className="card mb-6">
@@ -199,13 +194,14 @@ export default function WeeklyReview() {
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading || formData.weekNumber > 8}
-            className="btn-primary w-full disabled:opacity-50"
-          >
-            {loading ? 'Submitting...' : 'Submit Review'}
-          </button>
+          <Button
+              type="submit"
+              loading={loading}
+              className="w-full"
+              disabled={formData.weekNumber > 8}
+            >
+              Submit Review
+            </Button>
         </form>
       </main>
     </div>

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
+import Navbar from '../components/Navbar';
+import Button from '../components/Button';
 
 export default function ReturnRequest() {
   const navigate = useNavigate();
@@ -71,14 +73,7 @@ export default function ReturnRequest() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link to="/dashboard" className="text-gray-600 hover:text-gray-900">
-            ← Back
-          </Link>
-          <h1 className="font-semibold text-gray-900">Return Request</h1>
-        </div>
-      </nav>
+      <Navbar showBack title="Return Request" />
 
       <main className="max-w-2xl mx-auto px-4 py-8">
         {existingReturns.length > 0 && (
@@ -169,13 +164,13 @@ export default function ReturnRequest() {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading || !shoe}
-            className="btn-primary w-full disabled:opacity-50"
-          >
-            {loading ? 'Submitting...' : 'Submit Return Request'}
-          </button>
+          <Button
+              type="submit"
+              loading={loading}
+              className="w-full"
+            >
+              Submit Request
+            </Button>
         </form>
       </main>
     </div>
