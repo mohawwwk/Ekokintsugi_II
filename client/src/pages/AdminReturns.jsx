@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import { useToast } from '../context/ToastContext';
 import Layout from '../components/Layout';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
@@ -12,8 +13,11 @@ export default function AdminReturns() {
   const [returns, setReturns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedReturn, setSelectedReturn] = useState(null);
-  const [updateData, setUpdateData] = useState({ status: '', finalAction: '' });
-  const [success, setSuccess] = useState('');
+  const { success, error: toastError } = useToast();
+  const [updateData, setUpdateData] = useState({
+    status: 'Requested',
+    finalAction: ''
+  });
 
   useEffect(() => {
     fetchReturns();
@@ -30,21 +34,23 @@ export default function AdminReturns() {
     }
   };
 
-  const handleUpdate = async () => {
-    try {
-      await api.put(`/returns/update/${selectedReturn.id}`, updateData);
-      setSuccess('Return updated successfully!');
-      setSelectedReturn(null);
-      setUpdateData({ status: '', finalAction: '' });
-      fetchReturns();
-    } catch (error) {
-      console.error('Failed to update return:', error);
-    }
-  };
-
   const openUpdateModal = (ret) => {
     setSelectedReturn(ret);
-    setUpdateData({ status: ret.status, finalAction: ret.finalAction || '' });
+    setUpdateData({
+      status: ret.status,
+      finalAction: ret.finalAction || ''
+    });
+  };
+
+  const handleUpdate = async () => {
+    try {
+      await api.put(`/returns/${selectedReturn.id}`, updateData);
+      success('Return updated successfully');
+      setSelectedReturn(null);
+      fetchReturns();
+    } catch (err) {
+      toastError(err.response?.data?.message || 'Failed to update return');
+    }
   };
 
   const getStatusVariant = (status) => {
@@ -72,11 +78,6 @@ export default function AdminReturns() {
 
   return (
     <Layout showBack title="Manage Returns">
-      {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
-          {success}
-        </div>
-      )}
 
       {returns.length === 0 ? (
         <Card className="text-center py-12">

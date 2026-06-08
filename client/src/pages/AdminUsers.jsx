@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import { useToast } from '../context/ToastContext';
 import Layout from '../components/Layout';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
@@ -13,6 +14,7 @@ export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const { success, error: toastError } = useToast();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -23,8 +25,6 @@ export default function AdminUsers() {
     address: '',
     shoeSize: ''
   });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -47,12 +47,10 @@ export default function AdminUsers() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
 
     try {
       await api.post('/admin/create-user', formData);
-      setSuccess('User created successfully!');
+      success('User created successfully!');
       setShowModal(false);
       setFormData({
         name: '',
@@ -66,7 +64,7 @@ export default function AdminUsers() {
       });
       fetchUsers();
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to create user');
+      toastError(err.response?.data?.error || 'Failed to create user');
     }
   };
 
@@ -147,12 +145,6 @@ export default function AdminUsers() {
         title="Create New User"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm border border-red-100">
-              {error}
-            </div>
-          )}
-
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="Full Name"

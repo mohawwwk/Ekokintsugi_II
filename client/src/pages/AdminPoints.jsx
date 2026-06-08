@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import { useToast } from '../context/ToastContext';
 import Layout from '../components/Layout';
 import Card from '../components/Card';
 import Modal from '../components/Modal';
@@ -14,8 +15,7 @@ export default function AdminPoints() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [pointsAction, setPointsAction] = useState('add');
   const [points, setPoints] = useState('');
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
+  const { success, error: toastError } = useToast();
 
   useEffect(() => {
     fetchUsers();
@@ -35,28 +35,25 @@ export default function AdminPoints() {
   const handleSubmit = async () => {
     if (!selectedUser || !points) return;
     
-    setError('');
-    setSuccess('');
-
     try {
       if (pointsAction === 'add') {
         await api.post('/points/add', {
           userId: selectedUser.id,
           points: parseInt(points)
         });
-        setSuccess(`Added ${points} points to ${selectedUser.name}`);
+        success(`Added ${points} points to ${selectedUser.name}`);
       } else {
-        await api.put('/points/redeem', {
+        await api.post('/points/redeem', {
           userId: selectedUser.id,
           points: parseInt(points)
         });
-        setSuccess(`Redeemed ${points} points from ${selectedUser.name}`);
+        success(`Redeemed ${points} points from ${selectedUser.name}`);
       }
       setPoints('');
       setSelectedUser(null);
       fetchUsers();
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to update points');
+      toastError(err.response?.data?.message || 'Failed to update points');
     }
   };
 
@@ -70,18 +67,6 @@ export default function AdminPoints() {
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Member Point Balances</h2>
           
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">
-              {success}
-            </div>
-          )}
-
           <div className="grid gap-4">
             {users.map(user => (
               <Card key={user.id}>
