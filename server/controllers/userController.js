@@ -1,6 +1,10 @@
 const prisma = require('../utils/prisma');
 const response = require('../utils/responseHelper');
 
+/**
+ * Get current authenticated user details and associated data
+ * @route GET /api/user/me
+ */
 exports.getMe = async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
