@@ -1,4 +1,5 @@
 const prisma = require('../utils/prisma');
+const response = require('../utils/responseHelper');
 
 exports.addPoints = async (req, res) => {
   try {
@@ -6,7 +7,7 @@ exports.addPoints = async (req, res) => {
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return response.error(res, 'User not found', 404);
     }
 
     const updatedUser = await prisma.user.update({
@@ -17,18 +18,17 @@ exports.addPoints = async (req, res) => {
       }
     });
 
-    res.json({
-      message: `Added ${points} points to ${user.name}`,
+    return response.success(res, {
       user: {
         id: updatedUser.id,
         name: updatedUser.name,
         pointsTotal: updatedUser.pointsTotal,
         pointsRemaining: updatedUser.pointsRemaining
       }
-    });
+    }, `Added ${points} points to ${user.name}`);
   } catch (error) {
     console.error('Add points error:', error);
-    res.status(500).json({ error: 'Failed to add points' });
+    return response.error(res, 'Failed to add points');
   }
 };
 
@@ -38,11 +38,11 @@ exports.redeemPoints = async (req, res) => {
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return response.error(res, 'User not found', 404);
     }
 
     if (user.pointsRemaining < parseInt(points)) {
-      return res.status(400).json({ error: 'Insufficient points' });
+      return response.error(res, 'Insufficient points', 400);
     }
 
     const updatedUser = await prisma.user.update({
@@ -53,8 +53,7 @@ exports.redeemPoints = async (req, res) => {
       }
     });
 
-    res.json({
-      message: `Redeemed ${points} points from ${user.name}`,
+    return response.success(res, {
       user: {
         id: updatedUser.id,
         name: updatedUser.name,
@@ -62,10 +61,10 @@ exports.redeemPoints = async (req, res) => {
         pointsUsed: updatedUser.pointsUsed,
         pointsRemaining: updatedUser.pointsRemaining
       }
-    });
+    }, `Redeemed ${points} points from ${user.name}`);
   } catch (error) {
     console.error('Redeem points error:', error);
-    res.status(500).json({ error: 'Failed to redeem points' });
+    return response.error(res, 'Failed to redeem points');
   }
 };
 
@@ -85,12 +84,12 @@ exports.getPoints = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return response.error(res, 'User not found', 404);
     }
 
-    res.json({ user });
+    return response.success(res, { user });
   } catch (error) {
     console.error('Get points error:', error);
-    res.status(500).json({ error: 'Failed to fetch points' });
+    return response.error(res, 'Failed to fetch points');
   }
 };
