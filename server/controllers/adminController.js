@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const prisma = require('../utils/prisma');
+const response = require('../utils/responseHelper');
 
 const SHOE_PREFIXES = ['EKO-', 'KNT-', 'CIR-'];
 const TREE_PREFIXES = ['TR-', 'TRE-', 'TREE-'];
@@ -26,12 +27,12 @@ exports.createUser = async (req, res) => {
 
     const userCount = await prisma.user.count();
     if (userCount >= 10) {
-      return res.status(400).json({ error: 'Maximum 10 users allowed. Cannot create more users.' });
+      return response.error(res, 'Maximum 10 users allowed. Cannot create more users.', 400);
     }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ error: 'Email already registered' });
+      return response.error(res, 'Email already registered', 400);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -100,58 +101,45 @@ exports.createUser = async (req, res) => {
       include: { shoe: true, tree: true }
     });
 
-    res.status(201).json({
-      message: 'User created successfully with shoe and tree assigned',
-      user: createdUser
-    });
+    return response.success(res, createdUser, 'User created successfully with assigned assets', 201);
   } catch (error) {
     console.error('Create user error:', error);
-    res.status(500).json({ error: 'Failed to create user' });
+    return response.error(res, 'Failed to create user');
+  }
+};
+
+exports.getStats = async (req, res) => {
+  try {
+    const userCount = await prisma.user.count();
+    const returnCount = await prisma.return.count();
+    const reviewCount = await prisma.review.count();
+    const pointsTotal = await prisma.user.aggregate({
+      _sum: { pointsTotal: true }
+    });
+
+    return response.success(res, {
+      users: userCount,
+      returns: returnCount,
+      reviews: reviewCount,
+      totalPoints: pointsTotal._sum.pointsTotal || 0
+    });
+  } catch (error) {
+    console.error('Get stats error:', error);
+    return response.error(res, 'Failed to fetch statistics');
   }
 };
 
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
-      include: {
-        shoe: true,
-        tree: true,
-        reviews: {
-          orderBy: { weekNumber: 'asc' }
-        },
-        returns: true
-      },
+      include: { shoe: true, tree: true },
       orderBy: { createdAt: 'desc' }
     });
 
-    const usersWithStats = users.map(user => ({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-      city: user.city,
-      address: user.address,
-      shoeSize: user.shoeSize,
-      startDate: user.startDate,
-      endDate: user.endDate,
-      pointsTotal: user.pointsTotal,
-      pointsUsed: user.pointsUsed,
-      pointsRemaining: user.pointsRemaining,
-      qrCode: user.qrCode,
-      reviewsCompleted: user.reviews.length,
-      maxReviews: 8,
-      shoe: user.shoe,
-      tree: user.tree,
-      reviews: user.reviews,
-      returns: user.returns,
-      createdAt: user.createdAt
-    }));
-
-    res.json({ users: usersWithStats, total: users.length });
+    return response.success(res, { users });
   } catch (error) {
     console.error('Get all users error:', error);
-    res.status(500).json({ error: 'Failed to fetch users' });
+    return response.error(res, 'Failed to fetch users');
   }
 };
 
