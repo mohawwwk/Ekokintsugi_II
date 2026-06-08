@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import Navbar from '../components/Navbar';
+import Loading from '../components/Loading';
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -30,36 +32,14 @@ export default function Dashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
+    return <Loading fullScreen />;
   }
 
   const progress = data ? (data.user.reviewsCompleted / data.user.maxReviews) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center">
-              <span className="text-lg">🌱</span>
-            </div>
-            <span className="font-bold text-gray-900">EkoKintsugi</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">{user.name}</span>
-            <span className="px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full font-medium">
-              {user.role}
-            </span>
-            <button onClick={handleLogout} className="text-sm text-gray-600 hover:text-gray-900">
-              Logout
-            </button>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-8">Welcome, {data?.user?.name}</h1>
