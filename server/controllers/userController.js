@@ -1,4 +1,5 @@
 const prisma = require('../utils/prisma');
+const response = require('../utils/responseHelper');
 
 exports.getMe = async (req, res) => {
   try {
@@ -14,13 +15,13 @@ exports.getMe = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return response.error(res, 'User not found', 404);
     }
 
     const reviewsCompleted = user.reviews.length;
     const reviewsRemaining = 8 - reviewsCompleted;
 
-    res.json({
+    return response.success(res, {
       user: {
         id: user.id,
         name: user.name,
@@ -46,6 +47,6 @@ exports.getMe = async (req, res) => {
     });
   } catch (error) {
     console.error('Get me error:', error);
-    res.status(500).json({ error: 'Failed to fetch user data' });
+    return response.error(res, 'Failed to fetch user data');
   }
 };
