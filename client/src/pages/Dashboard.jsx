@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import Loading from '../components/Loading';
 import Layout from '../components/Layout';
+import Card from '../components/Card';
+import Badge from '../components/Badge';
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -42,7 +44,7 @@ export default function Dashboard() {
       <h1 className="text-2xl font-bold text-gray-900 mb-8">Welcome, {data?.user?.name}</h1>
 
         <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div className="card">
+          <Card>
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
                 <span className="text-2xl">👟</span>
@@ -58,18 +60,18 @@ export default function Dashboard() {
               <div className="text-sm text-gray-600 space-y-1">
                 <p>ID: {data.shoe.shoeId}</p>
                 <p>Size: {data.shoe.size}</p>
-                <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
-                  data.shoe.status === 'Delivered' ? 'bg-green-100 text-green-700' :
-                  data.shoe.status === 'PreBooked' ? 'bg-yellow-100 text-yellow-700' :
-                  'bg-gray-100 text-gray-700'
-                }`}>
+                <Badge variant={
+                  data.shoe.status === 'Delivered' ? 'success' :
+                  data.shoe.status === 'PreBooked' ? 'warning' :
+                  'gray'
+                }>
                   {data.shoe.status}
-                </span>
+                </Badge>
               </div>
             )}
-          </div>
+          </Card>
 
-          <div className="card">
+          <Card>
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                 <span className="text-2xl">🌳</span>
@@ -77,7 +79,7 @@ export default function Dashboard() {
               <div>
                 <p className="text-sm text-gray-600">Your Tree</p>
                 <p className="font-semibold text-gray-900">
-                  {data?.tree?.plantType || 'Not Assigned'}
+                  {data?.tree?.plantType || 'Pending'}
                 </p>
               </div>
             </div>
@@ -85,89 +87,84 @@ export default function Dashboard() {
               <div className="text-sm text-gray-600 space-y-1">
                 <p>ID: {data.tree.treeId}</p>
                 <p>Location: {data.tree.location}</p>
-                <span className="inline-block px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                  {data.tree.status}
-                </span>
+                <Badge variant="success">{data.tree.status}</Badge>
               </div>
             )}
-          </div>
+          </Card>
 
-          <div className="card">
+          <Card>
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                 <span className="text-2xl">⭐</span>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Points</p>
-                <p className="font-semibold text-2xl text-gray-900">{data?.user?.pointsRemaining}</p>
+                <p className="text-sm text-gray-600">Circle Points</p>
+                <p className="font-semibold text-gray-900">{data?.user?.pointsRemaining}</p>
               </div>
             </div>
-            <div className="text-sm text-gray-600">
-              <p>Total: {data?.user?.pointsTotal}</p>
-              <p>Used: {data?.user?.pointsUsed}</p>
+            <div className="text-sm text-gray-600 space-y-1">
+              <p>Total Earned: {data?.user?.pointsTotal}</p>
+              <p>Total Used: {data?.user?.pointsUsed}</p>
+              <Link to="/qr" className="text-primary-600 hover:underline inline-block mt-1">
+                View My QR Code →
+              </Link>
             </div>
-          </div>
+          </Card>
         </div>
 
-        <div className="card mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Review Progress</h2>
-              <p className="text-sm text-gray-600">{data?.user?.reviewsCompleted} of {data?.user?.maxReviews} weeks completed</p>
+        <div className="grid md:grid-cols-2 gap-8">
+          <Card title="Review Status">
+            <div className="flex justify-between text-sm mb-2">
+              <span className="text-gray-600">Weekly Reviews</span>
+              <span className="font-medium text-gray-900">
+                {data?.user?.reviewsCompleted} / {data?.user?.maxReviews}
+              </span>
             </div>
-            <Link to="/review" className="btn-primary">
-              {data?.user?.reviewsCompleted < 8 ? 'Submit Review' : 'View Reviews'}
-            </Link>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
-            <div
-              className="bg-primary-600 h-3 rounded-full transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="card">
-            <h3 className="font-semibold text-gray-900 mb-4">Your QR Code</h3>
-            <div className="text-center">
-              <Link
-                to={`/qr/${user.id}`}
-                className="inline-block p-4 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                <div className="w-32 h-32 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <span className="text-4xl">📱</span>
-                </div>
-                <span className="text-sm text-primary-600 font-medium">View QR Code</span>
-              </Link>
+            <div className="w-full bg-gray-100 rounded-full h-2 mb-6">
+              <div
+                className="bg-primary-600 h-2 rounded-full transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              ></div>
             </div>
-          </div>
 
-          <div className="card">
-            <h3 className="font-semibold text-gray-900 mb-4">Quick Actions</h3>
-            <div className="space-y-3">
-              <Link to="/review" className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">📝</span>
-                  <span className="text-gray-900">Weekly Review</span>
+            <div className="space-y-4">
+              {data?.user?.reviewsCompleted < data?.user?.maxReviews ? (
+                <div className="bg-primary-50 p-4 rounded-lg border border-primary-100">
+                  <p className="text-sm text-primary-800 mb-3">
+                    Submit your week {data?.user?.reviewsCompleted + 1} review to earn 10 points!
+                  </p>
+                  <Link to="/review" className="btn-primary inline-block text-center w-full">
+                    Start Weekly Review
+                  </Link>
                 </div>
-              </Link>
-              <Link to="/return" className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">↩️</span>
-                  <span className="text-gray-900">Request Return</span>
+              ) : (
+                <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+                  <p className="text-sm text-green-800">
+                    You've completed all weekly reviews for this cycle. Great job!
+                  </p>
                 </div>
-              </Link>
-              {user.role === 'admin' && (
-                <Link to="/admin" className="block p-3 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">⚙️</span>
-                    <span className="text-primary-700 font-medium">Admin Panel</span>
-                  </div>
-                </Link>
               )}
             </div>
-          </div>
+          </Card>
+
+          <Card title="Quick Actions">
+            <div className="grid grid-cols-2 gap-4">
+              <Link
+                to="/return"
+                className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors border border-gray-100"
+              >
+                <span className="text-2xl mb-2">📦</span>
+                <span className="text-sm font-medium text-gray-900">Return Shoe</span>
+              </Link>
+              <Link
+                to="/qr"
+                className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors border border-gray-100"
+              >
+                <span className="text-2xl mb-2">📱</span>
+                <span className="text-sm font-medium text-gray-900">My QR Code</span>
+              </Link>
+            </div>
+          </Card>
         </div>
 
         {data?.reviews?.length > 0 && (
