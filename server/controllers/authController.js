@@ -3,6 +3,11 @@ const jwt = require('jsonwebtoken');
 const prisma = require('../utils/prisma');
 const response = require('../utils/responseHelper');
 
+/**
+ * Helper to generate JWT token for a user
+ * @param {Object} user - User object from Prisma
+ * @returns {string} JWT token
+ */
 const generateToken = (user) => {
   return jwt.sign(
     { id: user.id, email: user.email, role: user.role },
@@ -11,6 +16,10 @@ const generateToken = (user) => {
   );
 };
 
+/**
+ * Register a new user
+ * @route POST /api/auth/signup
+ */
 exports.signup = async (req, res) => {
   try {
     const { name, phone, email, password, role, city, address, shoeSize } = req.body;
@@ -57,6 +66,10 @@ exports.signup = async (req, res) => {
   }
 };
 
+/**
+ * Authenticate user and return token
+ * @route POST /api/auth/login
+ */
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
