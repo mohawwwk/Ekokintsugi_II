@@ -1,5 +1,6 @@
 const QRCode = require('qrcode');
 const prisma = require('../utils/prisma');
+const response = require('../utils/responseHelper');
 
 exports.generateQR = async (req, res) => {
   try {
@@ -11,7 +12,7 @@ exports.generateQR = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return response.error(res, 'User not found', 404);
     }
 
     const qrData = {
@@ -50,7 +51,7 @@ exports.generateQR = async (req, res) => {
       }
     });
 
-    res.json({
+    return response.success(res, {
       qrCode: qrImage,
       userId: user.id,
       name: user.name,
@@ -58,6 +59,6 @@ exports.generateQR = async (req, res) => {
     });
   } catch (error) {
     console.error('Generate QR error:', error);
-    res.status(500).json({ error: 'Failed to generate QR code' });
+    return response.error(res, 'Failed to generate QR code');
   }
 };
