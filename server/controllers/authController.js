@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const prisma = require('../utils/prisma');
+const response = require('../utils/responseHelper');
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -16,12 +17,12 @@ exports.signup = async (req, res) => {
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ error: 'Email already registered' });
+      return response.error(res, 'Email already registered', 400);
     }
 
     const userCount = await prisma.user.count();
     if (userCount >= 10) {
-      return res.status(400).json({ error: 'Maximum 10 users allowed' });
+      return response.error(res, 'Maximum 10 users allowed', 400);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -41,8 +42,7 @@ exports.signup = async (req, res) => {
 
     const token = generateToken(user);
 
-    res.status(201).json({
-      message: 'User registered successfully',
+    return response.success(res, {
       token,
       user: {
         id: user.id,
@@ -50,10 +50,10 @@ exports.signup = async (req, res) => {
         email: user.email,
         role: user.role
       }
-    });
+    }, 'User registered successfully', 201);
   } catch (error) {
     console.error('Signup error:', error);
-    res.status(500).json({ error: 'Registration failed' });
+    return response.error(res, 'Registration failed');
   }
 };
 
@@ -63,18 +63,17 @@ exports.login = async (req, res) => {
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return response.error(res, 'Invalid credentials', 401);
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return response.error(res, 'Invalid credentials', 401);
     }
 
     const token = generateToken(user);
 
-    res.json({
-      message: 'Login successful',
+    return response.success(res, {
       token,
       user: {
         id: user.id,
@@ -82,9 +81,9 @@ exports.login = async (req, res) => {
         email: user.email,
         role: user.role
       }
-    });
+    }, 'Login successful');
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Login failed' });
+    return response.error(res, 'Login failed');
   }
 };
