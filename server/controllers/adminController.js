@@ -121,6 +121,9 @@ exports.getStats = async (req, res) => {
     const userCount = await prisma.user.count();
     const returnCount = await prisma.return.count();
     const reviewCount = await prisma.review.count();
+    const pendingReturns = await prisma.return.count({
+      where: { status: 'Requested' }
+    });
     const pointsTotal = await prisma.user.aggregate({
       _sum: { pointsTotal: true }
     });
@@ -129,6 +132,7 @@ exports.getStats = async (req, res) => {
       users: userCount,
       returns: returnCount,
       reviews: reviewCount,
+      pendingReturns,
       totalPoints: pointsTotal._sum.pointsTotal || 0
     });
   } catch (error) {

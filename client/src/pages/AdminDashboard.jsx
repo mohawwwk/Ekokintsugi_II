@@ -23,14 +23,14 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const response = await api.get('/admin/users');
-      const users = response.data.users;
+      const res = await api.get('/admin/stats');
+      const data = res.data.data;
       
       setStats({
-        totalUsers: users.length,
-        totalReviews: users.reduce((sum, u) => sum + (u.reviews?.length || 0), 0),
-        totalReturns: users.reduce((sum, u) => sum + (u.returns?.length || 0), 0),
-        pendingReturns: users.reduce((sum, u) => sum + (u.returns?.filter(r => r.status === 'Requested').length || 0), 0)
+        totalUsers: data.users,
+        totalReviews: data.reviews,
+        totalReturns: data.returns,
+        pendingReturns: data.pendingReturns || 0
       });
     } catch (error) {
       console.error('Failed to fetch stats:', error);
