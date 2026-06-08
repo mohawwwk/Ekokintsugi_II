@@ -3,6 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import Button from '../components/Button';
 import Layout from '../components/Layout';
+import Card from '../components/Card';
+import Badge from '../components/Badge';
+import Input from '../components/Input';
 
 export default function ReturnRequest() {
   const navigate = useNavigate();
@@ -61,22 +64,21 @@ export default function ReturnRequest() {
     }
   };
 
-  const getStatusBadge = (status) => {
-    const styles = {
-      Requested: 'bg-yellow-100 text-yellow-700',
-      Approved: 'bg-blue-100 text-blue-700',
-      Received: 'bg-purple-100 text-purple-700',
-      Completed: 'bg-green-100 text-green-700'
+  const getStatusBadgeVariant = (status) => {
+    const variants = {
+      Requested: 'warning',
+      Approved: 'info',
+      Received: 'purple',
+      Completed: 'success'
     };
-    return `px-2 py-1 rounded-full text-xs font-medium ${styles[status] || 'bg-gray-100 text-gray-700'}`;
+    return variants[status] || 'gray';
   };
 
   return (
     <Layout showBack title="Return Request">
       <div className="max-w-2xl mx-auto">
         {existingReturns.length > 0 && (
-          <div className="card mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Your Return Requests</h2>
+          <Card title="Your Return Requests" className="mb-6">
             <div className="space-y-3">
               {existingReturns.map(ret => (
                 <div key={ret.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -86,83 +88,58 @@ export default function ReturnRequest() {
                       {new Date(ret.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <span className={getStatusBadge(ret.status)}>{ret.status}</span>
+                  <Badge variant={getStatusBadgeVariant(ret.status)}>{ret.status}</Badge>
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
         )}
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-            {error}
-          </div>
-        )}
-
-        {success && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
-            {success}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="card">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">Request a Return</h2>
-
-          {shoe && (
-            <div className="bg-primary-50 rounded-lg p-4 mb-6">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">👟</span>
-                <div>
-                  <p className="font-medium text-gray-900">{shoe.productLine}</p>
-                  <p className="text-sm text-gray-600">ID: {shoe.shoeId} | Size: {shoe.size}</p>
-                </div>
-              </div>
+        <Card title="New Return Request">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
+              {error}
             </div>
           )}
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Reason for Return
-            </label>
-            <textarea
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">
+              {success}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 mb-4">
+              <p className="text-sm text-gray-600 mb-1">Returning Asset:</p>
+              <p className="font-semibold text-gray-900">
+                {shoe ? `${shoe.productLine} (${shoe.shoeId})` : 'Loading...'}
+              </p>
+            </div>
+
+            <Input
+              label="Reason for Return"
               name="reason"
               value={formData.reason}
               onChange={handleChange}
-              className="input-field h-24 resize-none"
-              placeholder="Please describe why you are returning the shoe..."
+              placeholder="Why are you returning the shoe?"
               required
             />
-          </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Shoe Condition
-            </label>
-            <div className="grid grid-cols-3 gap-3">
-              {['Good', 'Fair', 'Damaged'].map(condition => (
-                <label
-                  key={condition}
-                  className={`flex items-center justify-center p-3 rounded-lg border cursor-pointer transition-colors ${
-                    formData.condition === condition
-                      ? 'border-primary-500 bg-primary-50 text-primary-700'
-                      : 'border-gray-200 hover:bg-gray-50'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="condition"
-                    value={condition}
-                    checked={formData.condition === condition}
-                    onChange={handleChange}
-                    className="sr-only"
-                  />
-                  <span className="font-medium">{condition}</span>
-                </label>
-              ))}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Shoe Condition</label>
+              <select
+                name="condition"
+                value={formData.condition}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+              >
+                <option value="Good">Good</option>
+                <option value="Worn">Worn</option>
+                <option value="Damaged">Damaged</option>
+              </select>
             </div>
-          </div>
 
-          <Button
+            <Button
               type="submit"
               loading={loading}
               className="w-full"
@@ -170,7 +147,8 @@ export default function ReturnRequest() {
               Submit Request
             </Button>
           </form>
-        </div>
-      </Layout>
-    );
-  }
+        </Card>
+      </div>
+    </Layout>
+  );
+}
